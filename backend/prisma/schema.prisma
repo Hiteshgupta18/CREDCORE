@@ -1,0 +1,257 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Management
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  validations HospitalValidation[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  VERIFIER
+}
+
+// Hospital/Provider Information
+model Hospital {
+  id                String           @id @default(uuid())
+  name              String
+  registrationNo    String?          @unique
+  licenseNumber     String?          @unique
+  email             String?
+  phone             String?
+  website           String?
+  hospitalType      HospitalType     @default(PRIVATE)
+  status            HospitalStatus   @default(PENDING)
+  verificationScore Float            @default(0.0)
+  isVerified        Boolean          @default(false)
+  verifiedAt        DateTime?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  addresses         Address[]
+  schemes           HospitalScheme[]
+  credentials       Credential[]
+  validations       HospitalValidation[]
+  documents         Document[]
+
+  @@index([registrationNo])
+  @@index([licenseNumber])
+  @@index([status])
+  @@map("hospitals")
+}
+
+enum HospitalType {
+  GOVERNMENT
+  PRIVATE
+  NGO
+  CLINIC
+}
+
+enum HospitalStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  UNDER_REVIEW
+}
+
+// Address Information
+model Address {
+  id           String   @id @default(uuid())
+  hospitalId   String
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  state        String
+  pincode      String
+  zone         String?
+  latitude     Float?
+  longitude    Float?
+  isPrimary    Boolean  @default(false)
+  isVerified   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  hospital     Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+
+  @@index([hospitalId])
+  @@index([pincode])
+  @@index([city])
+  @@map("addresses")
+}
+
+// Government Schemes
+model Scheme {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  category    String?
+  eligibility String?
+  benefits    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  hospitals   HospitalScheme[]
+
+  @@map("schemes")
+}
+
+// Many-to-Many relation between Hospital and Scheme
+model HospitalScheme {
+  id         String   @id @default(uuid())
+  hospitalId String
+  schemeId   String
+  enrolledAt DateTime @default(now())
+  isActive   Boolean  @default(true)
+
+  hospital   Hospital @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  scheme     Scheme   @relation(fields: [schemeId], references: [id], onDelete: Cascade)
+
+  @@unique([hospitalId, schemeId])
+  @@index([hospitalId])
+  @@index([schemeId])
+  @@map("hospital_schemes")
+}
+
+// Credentials and Certifications
+model Credential {
+  id             String         @id @default(uuid())
+  hospitalId     String
+  type           CredentialType
+  number         String
+  issuedBy       String?
+  issuedDate     DateTime?
+  expiryDate     DateTime?
+  isVerified     Boolean        @default(false)
+  verifiedAt     DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  hospital       Hospital       @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+
+  @@index([hospitalId])
+  @@index([type])
+  @@map("credentials")
+}
+
+enum CredentialType {
+  MEDICAL_LICENSE
+  REGISTRATION_CERTIFICATE
+  ACCREDITATION
+  TAX_CERTIFICATE
+  INSURANCE
+  OTHER
+}
+
+// Document Storage
+model Document {
+  id         String       @id @default(uuid())
+  hospitalId String
+  type       DocumentType
+  fileName   String
+  filePath   String
+  fileSize   Int?
+  mimeType   String?
+  uploadedAt DateTime     @default(now())
+  
+  hospital   Hospital     @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+
+  @@index([hospitalId])
+  @@map("documents")
+}
+
+enum DocumentType {
+  LICENSE
+  REGISTRATION
+  CERTIFICATE
+  ID_PROOF
+  ADDRESS_PROOF
+  OTHER
+}
+
+// Validation Records
+model HospitalValidation {
+  id              String           @id @default(uuid())
+  userId          String?
+  hospitalId      String?
+  inputData       Json             // Raw OCR or input data
+  extractedInfo   Json             // Parsed information
+  validationScore Float            @default(0.0)
+  status          ValidationStatus @default(PENDING)
+  notes           String?
+  validatedAt     DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  user            User?            @relation(fields: [userId], references: [id])
+  hospital        Hospital?        @relation(fields: [hospitalId], references: [id])
+
+  @@index([userId])
+  @@index([hospitalId])
+  @@index([status])
+  @@map("hospital_validations")
+}
+
+enum ValidationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  REQUIRES_REVIEW
+}
+
+// Reference Addresses for Jaccard Matching
+model ReferenceAddress {
+  id           String   @id @default(uuid())
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  state        String
+  pincode      String
+  zone         String?
+  landmark     String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([city])
+  @@index([pincode])
+  @@map("reference_addresses")
+}
+
+// Activity Logs
+model ActivityLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  entity    String?
+  entityId  String?
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("activity_logs")
+}

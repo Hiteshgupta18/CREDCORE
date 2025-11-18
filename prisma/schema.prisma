@@ -1,0 +1,118 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Core Tables (The "Golden Record")
+
+model Provider {
+  id                String           @id @default(uuid())
+  npi               String?          @unique
+  firstName         String
+  lastName          String
+  overallTrustScore Float           @default(0.0)
+  lastVerifiedAt    DateTime?
+  status            ProviderStatus   @default(ACTIVE)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  // Relations
+  locations         Location[]
+  credentials       Credential[]
+  discrepancyLogs   DiscrepancyLog[]
+
+  @@index([npi])
+  @@map("providers")
+}
+
+enum ProviderStatus {
+  ACTIVE
+  UNDER_REVIEW
+  INACTIVE
+}
+
+model Location {
+  id           String    @id @default(uuid())
+  providerId   String
+  addressLine1 String
+  city         String
+  state        String
+  zip          String
+  phone        String?
+  isPrimary    Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relations
+  provider     Provider  @relation(fields: [providerId], references: [id])
+
+  @@index([providerId])
+  @@map("locations")
+}
+
+model Credential {
+  id             String          @id @default(uuid())
+  providerId     String
+  type           CredentialType
+  number         String
+  expirationDate DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  // Relations
+  provider       Provider        @relation(fields: [providerId], references: [id])
+
+  @@index([providerId])
+  @@map("credentials")
+}
+
+enum CredentialType {
+  MEDICAL_LICENSE
+  BOARD_CERTIFICATION
+  OTHER
+}
+
+// AI & Validation Tables
+
+model RawScrapedData {
+  id          String   @id @default(uuid())
+  sourceUrl   String
+  scrapedAt   DateTime @default(now())
+  rawJson     Json     // JSONB column for flexible data storage
+  processed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("raw_scraped_data")
+}
+
+model DiscrepancyLog {
+  id              String             @id @default(uuid())
+  providerId      String
+  fieldName       String
+  currentValue    String
+  newFoundValue   String
+  aiConfidenceScore Float
+  status          DiscrepancyStatus  @default(PENDING_REVIEW)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  // Relations
+  provider        Provider           @relation(fields: [providerId], references: [id])
+
+  @@index([providerId])
+  @@map("discrepancy_logs")
+}
+
+enum DiscrepancyStatus {
+  PENDING_REVIEW
+  AUTO_UPDATED
+  DISMISSED
+}
