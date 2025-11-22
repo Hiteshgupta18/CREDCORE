@@ -12,6 +12,8 @@ import Directory from "./Directory";
 import Schemes from "./Schemes";
 import JaccardTest from "./components/JaccardTest";
 import MapTest from "./components/MapTest";
+import DataViewer from "./components/DataViewer";
+import Chatbot from "./components/chatbot/chatbot";
 
 function AppWrapper() {
   const location = useLocation();
@@ -20,6 +22,7 @@ function AppWrapper() {
   return (
     <>
       {!hideNavbar && <Navbar />}
+      <Chatbot />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/address-validation" element={<JaccardTest />} />
@@ -31,6 +34,7 @@ function AppWrapper() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/map-test" element={<MapTest />} />
+        <Route path="/data-viewer" element={<DataViewer />} />
       </Routes>
     </>
   );

@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import CrediCoreLogo from "./CrediCoreLogo.jpg";
+
+const API_URL = 'http://localhost:5000/api';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -9,6 +12,8 @@ export default function Contact() {
     subject: '',
     message: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -18,17 +23,35 @@ export default function Contact() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you can add your API call or email service integration
-    console.log('Form submitted:', formData);
-    alert('Thank you for your message! We will get back to you soon.');
-    setFormData({
-      fullName: '',
-      email: '',
-      subject: '',
-      message: ''
-    });
+    setLoading(true);
+    setSubmitStatus({ type: '', message: '' });
+    
+    try {
+      const response = await axios.post(`${API_URL}/contact`, formData);
+      
+      if (response.data.success) {
+        setSubmitStatus({
+          type: 'success',
+          message: 'Thank you for your message! We will get back to you soon.'
+        });
+        setFormData({
+          fullName: '',
+          email: '',
+          subject: '',
+          message: ''
+        });
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setSubmitStatus({
+        type: 'error',
+        message: 'Failed to submit message. Please try again later.'
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -97,7 +120,15 @@ export default function Contact() {
                 ></textarea>
               </div>
 
-              <button type="submit" className="submit-contact-btn">Send Message</button>
+              {submitStatus.message && (
+                <div className={`alert alert-${submitStatus.type}`}>
+                  {submitStatus.message}
+                </div>
+              )}
+
+              <button type="submit" className="submit-contact-btn" disabled={loading}>
+                {loading ? 'Sending...' : 'Send Message'}
+              </button>
             </form>
           </div>
 

@@ -238,6 +238,33 @@ model ReferenceAddress {
   @@map("reference_addresses")
 }
 
+// Contact Form Submissions
+model ContactMessage {
+  id        String   @id @default(uuid())
+  fullName  String
+  email     String
+  subject   String
+  message   String
+  status    MessageStatus @default(NEW)
+  replied   Boolean  @default(false)
+  repliedAt DateTime?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+  @@map("contact_messages")
+}
+
+enum MessageStatus {
+  NEW
+  READ
+  IN_PROGRESS
+  RESOLVED
+}
+
 // Activity Logs
 model ActivityLog {
   id        String   @id @default(uuid())

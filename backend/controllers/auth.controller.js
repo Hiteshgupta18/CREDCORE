@@ -131,3 +131,102 @@ exports.getCurrentUser = async (req, res) => {
     res.status(401).json({ success: false, error: 'Invalid token' });
   }
 };
+
+// Get all users (admin only)
+exports.getAllUsers = async (req, res) => {
+  try {
+    const { page = 1, limit = 20, role, search } = req.query;
+    const skip = (page - 1) * limit;
+
+    const where = {};
+    if (role) {
+      where.role = role;
+    }
+    if (search) {
+      where.OR = [
+        { email: { contains: search, mode: 'insensitive' } },
+        { firstName: { contains: search, mode: 'insensitive' } },
+        { lastName: { contains: search, mode: 'insensitive' } }
+      ];
+    }
+
+    const [users, total] = await Promise.all([
+      prisma.user.findMany({
+        where,
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true,
+          _count: {
+            select: {
+              validations: true
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' },
+        skip: parseInt(skip),
+        take: parseInt(limit)
+      }),
+      prisma.user.count({ where })
+    ]);
+
+    res.json({
+      success: true,
+      data: users,
+      pagination: {
+        total,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch users'
+    });
+  }
+};
+
+// Get user statistics
+exports.getUserStats = async (req, res) => {
+  try {
+    const [total, admins, users, verifiers, recentSignups] = await Promise.all([
+      prisma.user.count(),
+      prisma.user.count({ where: { role: 'ADMIN' } }),
+      prisma.user.count({ where: { role: 'USER' } }),
+      prisma.user.count({ where: { role: 'VERIFIER' } }),
+      prisma.user.count({
+        where: {
+          createdAt: {
+            gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // Last 24 hours
+          }
+        }
+      })
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        total,
+        byRole: {
+          admin: admins,
+          user: users,
+          verifier: verifiers
+        },
+        recentSignups
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching user stats:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch statistics'
+    });
+  }
+};

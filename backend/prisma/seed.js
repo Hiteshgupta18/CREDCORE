@@ -7,7 +7,6 @@ async function main() {
 
   // Clear existing data
   console.log('📝 Clearing existing data...');
-  await prisma.activityLog.deleteMany();
   await prisma.hospitalValidation.deleteMany();
   await prisma.document.deleteMany();
   await prisma.credential.deleteMany();

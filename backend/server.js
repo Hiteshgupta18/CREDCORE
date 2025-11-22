@@ -9,6 +9,7 @@ const addressRoutes = require('./routes/address.routes');
 const schemeRoutes = require('./routes/scheme.routes');
 const validationRoutes = require('./routes/validation.routes');
 const authRoutes = require('./routes/auth.routes');
+const contactRoutes = require('./routes/contact.routes');
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use('/api/hospitals', hospitalRoutes);
 app.use('/api/addresses', addressRoutes);
 app.use('/api/schemes', schemeRoutes);
 app.use('/api/validations', validationRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -48,7 +50,8 @@ app.get('/', (req, res) => {
       hospitals: '/api/hospitals',
       addresses: '/api/addresses',
       schemes: '/api/schemes',
-      validations: '/api/validations'
+      validations: '/api/validations',
+      contact: '/api/contact'
     }
   });
 });
