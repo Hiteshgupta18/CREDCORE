@@ -141,3 +141,60 @@ exports.getValidationsByHospital = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
+// General verify endpoint for document/hospital verification
+exports.verifyDocument = async (req, res) => {
+  try {
+    const { 
+      documentType, 
+      documentData, 
+      hospitalId,
+      userId 
+    } = req.body;
+
+    // Validate required fields
+    if (!documentType || !documentData) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Document type and data are required' 
+      });
+    }
+
+    // Prepare data for validation
+    const validationData = {
+      inputData: documentData,
+      extractedInfo: documentData, // Will be updated by OCR/AI processing
+      validationScore: 0.0,
+      status: 'PENDING'
+    };
+
+    // Add optional fields only if provided
+    if (userId) validationData.userId = userId;
+    if (hospitalId) validationData.hospitalId = hospitalId;
+
+    // Create validation record
+    const validation = await prisma.hospitalValidation.create({
+      data: validationData,
+      include: {
+        user: userId ? { 
+          select: { id: true, email: true, firstName: true, lastName: true } 
+        } : false,
+        hospital: hospitalId ? {
+          select: { id: true, name: true, registrationNo: true }
+        } : false
+      }
+    });
+
+    res.status(201).json({ 
+      success: true, 
+      message: 'Document submitted for verification',
+      data: validation 
+    });
+  } catch (error) {
+    console.error('Verification error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message || 'Verification failed' 
+    });
+  }
+};
