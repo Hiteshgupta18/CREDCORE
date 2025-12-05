@@ -195,6 +195,21 @@
   color: white;
 }
 
+.badge-admin {
+  background: #e74c3c;
+  color: white;
+}
+
+.badge-user {
+  background: #3498db;
+  color: white;
+}
+
+.badge-verifier {
+  background: #f39c12;
+  color: white;
+}
+
 .verified {
   color: #27ae60;
   font-weight: 600;

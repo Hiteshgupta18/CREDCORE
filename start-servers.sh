@@ -123,6 +123,7 @@ echo ""
 # Start Frontend
 if [ "$FRONTEND_RUNNING" = false ]; then
     echo "🌐 Starting Frontend Server..."
+    cd frontend
     
     # Check if node_modules exists
     if [ ! -d "node_modules" ]; then
@@ -131,9 +132,11 @@ if [ "$FRONTEND_RUNNING" = false ]; then
     fi
     
     # Start frontend in background
-    BROWSER=none npm start > frontend.log 2>&1 &
+    BROWSER=none npm start > ../frontend.log 2>&1 &
     FRONTEND_PID=$!
     echo -e "${GREEN}✓${NC} Frontend starting (PID: $FRONTEND_PID)"
+    
+    cd ..
     
     # Wait for frontend to be ready
     echo "⏳ Waiting for frontend to start..."

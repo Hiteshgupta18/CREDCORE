@@ -83,8 +83,17 @@ export default function Signup() {
         localStorage.setItem('token', response.data.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.data.user));
         
-        // Show success message
-        alert(`Account created successfully! Welcome, ${response.data.data.user.firstName}!`);
+        // Show success message with credentials
+        alert(
+          `✅ Account created successfully!\n\n` +
+          `Welcome, ${response.data.data.user.firstName} ${response.data.data.user.lastName}!\n\n` +
+          `📧 Email: ${formData.email}\n` +
+          `🔑 Password: ${formData.password}\n\n` +
+          `Please save these credentials for future login.`
+        );
+        
+        // Trigger auth state change for navbar update
+        window.dispatchEvent(new Event('authStateChanged'));
         
         // Redirect to dashboard
         navigate("/dashboard");
@@ -98,26 +107,6 @@ export default function Signup() {
   };
   return (
     <>
-      {/* ✅ Navbar added */}
-      <nav id="main-nav">
-        <div className="nav-container container">
-          <Link to="/" className="logo-link">
-            <img src={CrediCoreLogo} alt="CrediCore Logo" className="logo" />
-            <span className="brand-name">CrediCore</span>
-          </Link>
-
-          <ul className="nav-links">
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/validation">Validation</Link></li>
-            <li><Link to="/directory">Directory</Link></li>
-            <li><Link to="/alerts">Alerts</Link></li>
-            <li><Link to="/dashboard">Dashboard</Link></li>
-            <li><Link to="/contact">Contact</Link></li>
-          </ul>
-
-          <Link to="/login" className="login-button">Login / Sign Up</Link>
-        </div>
-      </nav>
 
       {/* ✅ Signup page content */}
       <div className="auth-body">

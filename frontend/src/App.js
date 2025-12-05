@@ -6,6 +6,7 @@ import Dashboard from "./Dashboard";
 import Contact from "./Contact";
 import Login from "./Login";
 import Signup from "./Signup";
+import Profile from "./Profile";
 import Navbar from "./Navbar";
 import HospitalValidation from "./HospitalValidation";
 import Directory from "./Directory";
@@ -31,6 +32,7 @@ function AppWrapper() {
         <Route path="/schemes" element={<Schemes />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/map-test" element={<MapTest />} />

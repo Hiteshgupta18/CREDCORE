@@ -5,7 +5,8 @@ import './DataViewer.css';
 const API_URL = 'http://localhost:5000/api';
 
 function DataViewer() {
-  const [activeTab, setActiveTab] = useState('hospitals');
+  const [activeTab, setActiveTab] = useState('users');
+  const [users, setUsers] = useState([]);
   const [hospitals, setHospitals] = useState([]);
   const [schemes, setSchemes] = useState([]);
   const [validations, setValidations] = useState([]);
@@ -23,6 +24,10 @@ function DataViewer() {
     
     try {
       switch (activeTab) {
+        case 'users':
+          const usersRes = await axios.get(`${API_URL}/auth/users`);
+          setUsers(usersRes.data.data || []);
+          break;
         case 'hospitals':
           const hospitalsRes = await axios.get(`${API_URL}/hospitals`);
           setHospitals(hospitalsRes.data.data || []);
@@ -49,6 +54,40 @@ function DataViewer() {
       setLoading(false);
     }
   };
+
+  const renderUsers = () => (
+    <div className="data-grid">
+      {users.map(user => (
+        <div key={user.id} className="data-card">
+          <h3>👤 {user.firstName} {user.lastName}</h3>
+          <div className="data-detail">
+            <span className="label">Email:</span>
+            <span>{user.email}</span>
+          </div>
+          <div className="data-detail">
+            <span className="label">Role:</span>
+            <span className={`badge badge-${user.role.toLowerCase()}`}>
+              {user.role}
+            </span>
+          </div>
+          <div className="data-detail">
+            <span className="label">Joined:</span>
+            <span>{new Date(user.createdAt).toLocaleDateString()}</span>
+          </div>
+          <div className="data-detail">
+            <span className="label">Last Updated:</span>
+            <span>{new Date(user.updatedAt).toLocaleDateString()}</span>
+          </div>
+          {user._count && (
+            <div className="data-detail">
+              <span className="label">Validations:</span>
+              <span>{user._count.validations || 0}</span>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
 
   const renderHospitals = () => (
     <div className="data-grid">
@@ -204,6 +243,12 @@ function DataViewer() {
 
       <div className="tabs">
         <button
+          className={`tab ${activeTab === 'users' ? 'active' : ''}`}
+          onClick={() => setActiveTab('users')}
+        >
+          👥 Users
+        </button>
+        <button
           className={`tab ${activeTab === 'hospitals' ? 'active' : ''}`}
           onClick={() => setActiveTab('hospitals')}
         >
@@ -246,6 +291,7 @@ function DataViewer() {
 
         {!loading && !error && (
           <>
+            {activeTab === 'users' && renderUsers()}
             {activeTab === 'hospitals' && renderHospitals()}
             {activeTab === 'schemes' && renderSchemes()}
             {activeTab === 'validations' && renderValidations()}
@@ -255,6 +301,9 @@ function DataViewer() {
 
         {!loading && !error && (
           <>
+            {activeTab === 'users' && users.length === 0 && (
+              <div className="empty-state">No users found</div>
+            )}
             {activeTab === 'hospitals' && hospitals.length === 0 && (
               <div className="empty-state">No hospitals found</div>
             )}

@@ -90,6 +90,9 @@ export default function Login() {
         // Show success message
         alert(`Welcome back, ${response.data.data.user.firstName}!`);
         
+        // Trigger auth state change for navbar update
+        window.dispatchEvent(new Event('authStateChanged'));
+        
         // Redirect to dashboard
         navigate("/dashboard");
       }
@@ -103,26 +106,6 @@ export default function Login() {
 
   return (
     <>
-      {/* ✅ Navbar added */}
-      <nav id="main-nav">
-        <div className="nav-container container">
-          <Link to="/" className="logo-link">
-            <img src={CrediCoreLogo} alt="CrediCore Logo" className="logo" />
-            <span className="brand-name">CrediCore</span>
-          </Link>
-
-          <ul className="nav-links">
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/validation">Validation</Link></li>
-            <li><Link to="/directory">Directory</Link></li>
-            <li><Link to="/alerts">Alerts</Link></li>
-            <li><Link to="/dashboard">Dashboard</Link></li>
-            <li><Link to="/contact">Contact</Link></li>
-          </ul>
-
-          <Link to="/login" className="login-button">Login / Sign Up</Link>
-        </div>
-      </nav>
 
       {/* ✅ Login UI below */}
       <div className="auth-body">

@@ -11,6 +11,9 @@ router.post('/login', authController.login);
 // Get current user profile
 router.get('/me', authController.getCurrentUser);
 
+// Update user profile
+router.put('/update-profile', authController.updateProfile);
+
 // Get all users (admin)
 router.get('/users', authController.getAllUsers);
 

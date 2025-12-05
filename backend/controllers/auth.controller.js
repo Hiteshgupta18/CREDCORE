@@ -193,6 +193,64 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
+// Update user profile
+exports.updateProfile = async (req, res) => {
+  try {
+    // Get token from header
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ success: false, error: 'No token provided' });
+    }
+
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const { firstName, lastName, email } = req.body;
+
+    // Check if email is being changed and if it's already taken
+    if (email && email !== decoded.email) {
+      const existingUser = await prisma.user.findUnique({
+        where: { email }
+      });
+
+      if (existingUser && existingUser.id !== decoded.userId) {
+        return res.status(400).json({ success: false, error: 'Email already in use' });
+      }
+    }
+
+    // Update user
+    const updatedUser = await prisma.user.update({
+      where: { id: decoded.userId },
+      data: {
+        firstName: firstName || undefined,
+        lastName: lastName || undefined,
+        email: email || undefined
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    });
+
+    res.json({
+      success: true,
+      data: updatedUser
+    });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({ success: false, error: 'Invalid token' });
+    }
+    res.status(500).json({ success: false, error: 'Failed to update profile' });
+  }
+};
+
 // Get user statistics
 exports.getUserStats = async (req, res) => {
   try {
