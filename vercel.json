@@ -1,14 +1,19 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "build",
-  "installCommand": "npm install --legacy-peer-deps",
   "rewrites": [
     {
       "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
-  "env": {
-    "REACT_APP_MAPBOX_TOKEN": "pk.eyJ1IjoiZ2F1dGFtamkiLCJhIjoiY21oZTM2dnJ4MDg1NDJscXl1YXJvMnd1NSJ9._jTb5haeAFDzD0XXgH6dnQ"
-  }
+  "headers": [
+    {
+      "source": "/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ]
 }
