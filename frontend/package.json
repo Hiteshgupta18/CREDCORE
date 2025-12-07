@@ -23,6 +23,7 @@
   "scripts": {
     "start": "PORT=3000 react-scripts start",
     "build": "react-scripts build",
+    "vercel-build": "npm install --legacy-peer-deps && react-scripts build",
     "test": "react-scripts test",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",

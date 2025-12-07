@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "name": "credcore-frontend",
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
+    }
+  ],
+  "env": {
+    "REACT_APP_MAPBOX_TOKEN": "pk.eyJ1IjoiZ2F1dGFtamkiLCJhIjoiY21oZTM2dnJ4MDg1NDJscXl1YXJvMnd1NSJ9._jTb5haeAFDzD0XXgH6dnQ"
+  },
+  "build": {
+    "env": {
+      "REACT_APP_MAPBOX_TOKEN": "pk.eyJ1IjoiZ2F1dGFtamkiLCJhIjoiY21oZTM2dnJ4MDg1NDJscXl1YXJvMnd1NSJ9._jTb5haeAFDzD0XXgH6dnQ"
+    }
+  }
+}
