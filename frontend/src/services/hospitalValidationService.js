@@ -1,64 +1,22 @@
-import prisma from './db';
+import axios from 'axios';
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 export const HospitalValidationService = {
   // Save OCR results and create provider record
   async saveOCRResults(data) {
     try {
-      // First save the raw OCR data
-      const rawData = await prisma.rawScrapedData.create({
-        data: {
-          sourceUrl: 'OCR_SCAN',
-          rawJson: data.rawData
+      // Note: This would need a corresponding backend endpoint
+      // For now, return mock success
+      console.log('OCR Results to save:', data);
+      return { 
+        success: true, 
+        message: 'OCR data logged. Backend endpoint needed for persistence.',
+        provider: {
+          id: 'temp-' + Date.now(),
+          ...data.parsedInfo
         }
-      });
-
-      // Create or update provider record
-      const provider = await prisma.provider.upsert({
-        where: {
-          npi: data.parsedInfo.licenseNumber || 'UNKNOWN'
-        },
-        update: {
-          firstName: data.parsedInfo.hospitalName.split(' ')[0] || 'Unknown',
-          lastName: data.parsedInfo.hospitalName.split(' ').slice(1).join(' ') || 'Provider',
-          overallTrustScore: 0.7, // Initial trust score
-          lastVerifiedAt: new Date(),
-        },
-        create: {
-          firstName: data.parsedInfo.hospitalName.split(' ')[0] || 'Unknown',
-          lastName: data.parsedInfo.hospitalName.split(' ').slice(1).join(' ') || 'Provider',
-          npi: data.parsedInfo.licenseNumber || 'UNKNOWN',
-          overallTrustScore: 0.7,
-          status: 'UNDER_REVIEW'
-        }
-      });
-
-      // Add location if address exists
-      if (data.parsedInfo.address) {
-        await prisma.location.create({
-          data: {
-            providerId: provider.id,
-            addressLine1: data.parsedInfo.address,
-            city: 'Unknown', // You might want to parse the address further
-            state: 'Unknown',
-            zip: 'Unknown',
-            isPrimary: true
-          }
-        });
-      }
-
-      // Add credential if license number exists
-      if (data.parsedInfo.licenseNumber) {
-        await prisma.credential.create({
-          data: {
-            providerId: provider.id,
-            type: 'MEDICAL_LICENSE',
-            number: data.parsedInfo.licenseNumber,
-            expirationDate: data.parsedInfo.validUntil ? new Date(data.parsedInfo.validUntil) : null
-          }
-        });
-      }
-
-      return { success: true, provider };
+      };
     } catch (error) {
       console.error('Error saving OCR results:', error);
       return { success: false, error: error.message };
@@ -68,15 +26,13 @@ export const HospitalValidationService = {
   // Get validation results for a provider
   async getValidationResults(providerId) {
     try {
-      const results = await prisma.discrepancyLog.findMany({
-        where: {
-          providerId
-        },
-        include: {
-          provider: true
-        }
-      });
-      return { success: true, results };
+      // This would call your backend API when implemented
+      console.log('Fetching validation results for:', providerId);
+      return { 
+        success: true, 
+        results: [],
+        message: 'Backend endpoint needed for validation results'
+      };
     } catch (error) {
       console.error('Error getting validation results:', error);
       return { success: false, error: error.message };
@@ -86,14 +42,13 @@ export const HospitalValidationService = {
   // Get all providers
   async getAllProviders() {
     try {
-      const providers = await prisma.provider.findMany({
-        include: {
-          locations: true,
-          credentials: true,
-          discrepancyLogs: true
-        }
-      });
-      return { success: true, providers };
+      // This would call your backend API when implemented
+      console.log('Fetching all providers');
+      return { 
+        success: true, 
+        providers: [],
+        message: 'Backend endpoint needed for provider list'
+      };
     } catch (error) {
       console.error('Error getting providers:', error);
       return { success: false, error: error.message };
