@@ -18,11 +18,10 @@ import Chatbot from "./components/chatbot/chatbot";
 
 function AppWrapper() {
   const location = useLocation();
-  const hideNavbar = location.pathname === "/login" || location.pathname === "/signup";
 
   return (
     <>
-      {!hideNavbar && <Navbar />}
+      <Navbar />
       <Chatbot />
       <Routes>
         <Route path="/" element={<HomePage />} />
