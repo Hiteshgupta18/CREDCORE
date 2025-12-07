@@ -6,6 +6,7 @@ function Navbar() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -66,14 +67,28 @@ function Navbar() {
           <img src={CrediCoreLogo} alt="CrediCore Logo" className="logo" />
           <span className="brand-name">CrediCore</span>
         </Link>
-        <ul className="nav-links">
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/validation">Hospital Validation</Link></li>
-          <li><Link to="/address-validation">Address Validation</Link></li>
-          <li><Link to="/directory">Directory</Link></li>
-          <li><Link to="/schemes">Schemes</Link></li>
-          <li><Link to="/dashboard">Dashboard</Link></li>
-          <li><Link to="/contact">Contact</Link></li>
+
+        {/* Hamburger Menu Button */}
+        <button 
+          className="mobile-menu-toggle"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          <span className={`hamburger ${mobileMenuOpen ? 'active' : ''}`}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </button>
+
+        <ul className={`nav-links ${mobileMenuOpen ? 'mobile-active' : ''}`}>
+          <li><Link to="/" onClick={() => setMobileMenuOpen(false)}>Home</Link></li>
+          <li><Link to="/validation" onClick={() => setMobileMenuOpen(false)}>Hospital Validation</Link></li>
+          <li><Link to="/address-validation" onClick={() => setMobileMenuOpen(false)}>Address Validation</Link></li>
+          <li><Link to="/directory" onClick={() => setMobileMenuOpen(false)}>Directory</Link></li>
+          <li><Link to="/schemes" onClick={() => setMobileMenuOpen(false)}>Schemes</Link></li>
+          <li><Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>Dashboard</Link></li>
+          <li><Link to="/contact" onClick={() => setMobileMenuOpen(false)}>Contact</Link></li>
         </ul>
         
         {user ? (
