@@ -105,18 +105,15 @@ export default function Login() {
   };
 
   return (
-    <>
-
-      {/* ✅ Login UI below */}
-      <div className="auth-body">
-        <div className="auth-container">
-          <header className="auth-header">
-            <Link to="/" className="logo-link">
-              <img src={CrediCoreLogo} alt="CrediCore Logo" className="logo" />
-              <span className="brand-name">CrediCore</span>
-            </Link>
-            <h2>Provider Data Validation Access</h2>
-          </header>
+    <div className="auth-body">
+      <div className="auth-container">
+        <header className="auth-header">
+          <Link to="/" className="logo-link">
+            <img src={CrediCoreLogo} alt="CrediCore Logo" className="logo" />
+            <span className="brand-name">CrediCore</span>
+          </Link>
+          <h2>Provider Data Validation Access</h2>
+        </header>
 
           <div className="form-card-wrapper">
             <div className="auth-form active">
@@ -176,6 +173,5 @@ export default function Login() {
           </div>
         </div>
       </div>
-    </>
   );
 }

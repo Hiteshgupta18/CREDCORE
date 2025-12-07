@@ -59,18 +59,15 @@ export default function Signup() {
     }
   };
   return (
-    <>
-
-      {/* ✅ Signup page content */}
-      <div className="auth-body">
-        <div className="auth-container">
-          <header className="auth-header">
-            <Link to="/" className="logo-link">
-              <img src={CrediCoreLogo} alt="CrediCore Logo" className="logo" />
-              <span className="brand-name">CrediCore</span>
-            </Link>
-            <h2>Create New Account</h2>
-          </header>
+    <div className="auth-body">
+      <div className="auth-container">
+        <header className="auth-header">
+          <Link to="/" className="logo-link">
+            <img src={CrediCoreLogo} alt="CrediCore Logo" className="logo" />
+            <span className="brand-name">CrediCore</span>
+          </Link>
+          <h2>Create New Account</h2>
+        </header>
 
           <div className="auth-form active">
             <h3>Create your account</h3>
@@ -151,6 +148,5 @@ export default function Signup() {
           </div>
         </div>
       </div>
-    </>
   );
 }
