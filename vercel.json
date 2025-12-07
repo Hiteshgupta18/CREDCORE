@@ -1,27 +1,15 @@
 {
   "version": 2,
-  "name": "credcore-frontend",
-  "builds": [
+  "buildCommand": "cd frontend && npm install --legacy-peer-deps && npm run build",
+  "outputDirectory": "frontend/build",
+  "installCommand": "npm install --legacy-peer-deps",
+  "rewrites": [
     {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "build"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "env": {
     "REACT_APP_MAPBOX_TOKEN": "pk.eyJ1IjoiZ2F1dGFtamkiLCJhIjoiY21oZTM2dnJ4MDg1NDJscXl1YXJvMnd1NSJ9._jTb5haeAFDzD0XXgH6dnQ"
-  },
-  "build": {
-    "env": {
-      "REACT_APP_MAPBOX_TOKEN": "pk.eyJ1IjoiZ2F1dGFtamkiLCJhIjoiY21oZTM2dnJ4MDg1NDJscXl1YXJvMnd1NSJ9._jTb5haeAFDzD0XXgH6dnQ"
-    }
   }
 }
